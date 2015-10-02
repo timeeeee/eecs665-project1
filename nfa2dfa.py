@@ -1,3 +1,8 @@
+""" Tim Clark
+    EECS 665
+    Project 1: NFA to DFA
+"""
+
 import re
 from sys import stdin
 
