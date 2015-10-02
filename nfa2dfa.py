@@ -3,13 +3,13 @@ from sys import stdin
 
 NULL = 'E'
 
-# Transitions are represented by nested key value pairs: the first key is the
-# start state, the second key is the symbol to follow, the value is a list of
-# resulting states. For example, transitions[2]['a'] will be a list of
-# integers representing the states reachable from state 2 on input 'a'.
 
 class FiniteAutomaton:
     def __init__(self, initial_state, transitions, final_states, alphabet):
+        # Transitions are represented by nested key value pairs: the first key is the
+        # start state, the second key is the symbol to follow, the value is a list of
+        # resulting states. For example, transitions[2]['a'] will be a list of
+        # integers representing the states reachable from state 2 on input 'a'.        
         self.transitions = transitions
         self.initial_state = initial_state
         self.final_states = final_states
@@ -26,8 +26,7 @@ class FiniteAutomaton:
                 if transition not in closure:
                     closure.append(transition)
                     unchecked.append(transition)
-        closure.sort()
-        return closure
+        return sorted(closure)
 
     def move(self, states, symbol):
         """Get states reachable from input states with symbol input"""
@@ -81,6 +80,7 @@ class FiniteAutomaton:
 
 
 def nfa_to_dfa(nfa):
+    """Take FiniteAutomaton object as input, return equivalent dfa object"""
     # create empty automaton to build from
     alphabet = nfa.alphabet
     dfa = FiniteAutomaton(1, dict(), [], alphabet)
@@ -126,6 +126,8 @@ def nfa_to_dfa(nfa):
                                        
                 
 def print_transition(start, symbol, end):
+    """print a transition from start state to end state, along input symbol
+    """
     template_string = "{{{}}} --{}--> {{{}}}"
     print template_string.format(",".join(map(str, start)),
                                  symbol,
@@ -133,12 +135,16 @@ def print_transition(start, symbol, end):
 
 
 def print_null_closure(state, closure, name):
+    """Print results of a null-closure on state. name is the dfa state
+    representing this collection of nfa states.
+    """
     template_string = "E-closure{{{}}} = {{{}}} = {}"
     print template_string.format(
         ",".join(map(str, state)), ",".join(map(str, closure)), name)
 
 
 def file_to_nfa(flo):
+    """Get input from a file object and construct a FiniteAutomaton object."""
     # get initial states
     match = re.match(r"Initial State\:\s*\{(.*)\}", flo.readline())
     initial_state = int(match.groups()[0])
@@ -169,14 +175,15 @@ def file_to_nfa(flo):
                     int(state) for state in end_states.split(",")]
 
     # return nfa
-    symbol_names.remove(NULL)
+    symbol_names.remove(NULL) # get alphabet by removing null symbol
     return FiniteAutomaton(
         initial_state, transitions, final_states, symbol_names)
 
 
 def main():
     nfa = file_to_nfa(stdin)
-    print nfa_to_dfa(nfa)
+    dfa = nfa_to_dfa(nfa)
+    print dfa
 
 
 if __name__ == "__main__":
