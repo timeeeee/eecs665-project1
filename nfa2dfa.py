@@ -83,7 +83,7 @@ class FiniteAutomaton:
 def nfa_to_dfa(nfa):
     # create empty automaton to build from
     alphabet = nfa.alphabet
-    dfa = FiniteAutomaton(1, dict(), None, alphabet)
+    dfa = FiniteAutomaton(1, dict(), [], alphabet)
 
     initial_state = nfa.null_closure([nfa.initial_state])
     print "E-closure(IO) = {{{}}} = 1\n".format(
@@ -94,7 +94,7 @@ def nfa_to_dfa(nfa):
 
     # Continue while there are "unmarked" states
     while(unmarked):
-        start = unmarked.pop()
+        start = unmarked.pop(0)
         initial_state_name = dfa_states[tuple(start)]
         print "Mark {}".format(initial_state_name)
         for symbol in alphabet:
@@ -106,7 +106,7 @@ def nfa_to_dfa(nfa):
                     # this set of nfa states is a new dfa state
                     new_state_name = len(dfa_states) + 1
                     dfa_states[tuple(new_state)] = new_state_name
-                    unmarked.append(new_state_name)
+                    unmarked.append(tuple(new_state))
                 else:
                     # This state already exists
                     new_state_name = dfa_states[tuple(new_state)]
@@ -122,7 +122,7 @@ def nfa_to_dfa(nfa):
             dfa.final_states.append(state_name)
     print "dfa final states = {}".format(dfa.final_states)
 
-    print dfa
+    return dfa
                                        
                 
 def print_transition(start, symbol, end):
@@ -169,8 +169,9 @@ def file_to_nfa(flo):
                     int(state) for state in end_states.split(",")]
 
     # return nfa
-    alphabet = [symbol for symbol in symbol_names if symbol != 'E']
-    return FiniteAutomaton(initial_state, transitions, final_states, alphabet)
+    symbol_names.remove(NULL)
+    return FiniteAutomaton(
+        initial_state, transitions, final_states, symbol_names)
 
 
 def main():
